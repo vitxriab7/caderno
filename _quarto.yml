@@ -29,7 +29,7 @@ website:
       - text: "Biografia"
         href: Biografia.qmd
       - text: "Mapas"
-        href: Mapas.qmd
+        href: mapas.qmd
     right:
       - icon: github
         href: "https://github.com/seu-usuario"
