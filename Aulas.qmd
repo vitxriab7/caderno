@@ -1,0 +1,922 @@
+---
+title: "Aulas"
+format: html
+---
+
+## Aula 1 – Apresentação e comandos R {#aula-1}
+
+Os tópicos abordados nessa aula foram:
+
+-   Operações básicas no R;
+-   Trabalhando com datasets;
+-   Transformações matemáticas;
+-   Uso de pacotes R.
+
+```{r}
+#carregando conjunto de dados interno do programa R.
+dados <- Orange
+dados = Orange
+
+#visualizando o conjunto de dados
+Orange
+
+### Transformações Matemáticas
+# Criar vetor com valores de circunferência
+circ <- dados$circumference  # Extrai coluna como vetor
+
+# Aplicar exponencial e logaritmo
+circ2 <- exp(circ)           # Exponencial
+circ3 <- log(circ2)          # Log do resultado anterior (volta ao original)
+
+# Adicionar nova coluna ao dataframe
+dados$logcirc <- log(dados$circumference)
+
+# Visualizar dataframe modificado
+head(dados)
+
+### Instalando pacotes no R. 
+
+
+# Instalar pacotes (executar apenas uma vez)
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+install.packages("tidyverse")
+install.packages("agricolae")
+
+# Carregar pacotes
+
+library(tidyverse)
+library(agricolae)
+
+### Exemplo com Gráfico Básico
+
+# Criar dados de exemplo
+dates <- c(7,14,21,28,35,42)
+severity <- c(0.1,5,10,35,50,60)
+data_curva <- data.frame(dates, severity)
+
+# Gráfico de colunas e linha
+data_curva |>
+  mutate(severity2 = c(1,10,35,58,70,82)) |> 
+  ggplot(aes(dates, severity2)) +
+  geom_col(fill = "black") +
+  geom_line(linewidth = 2, color = "purple") +
+  geom_point(size = 5, color = "black") +
+  labs(
+    title = "Progresso da doença ao longo dos dias",
+    x = "Dias após plantio",
+    y = "Severidade (%)"
+  ) +
+  theme_classic()
+
+## Dicas Rápidas
+
+#1. **Atalhos úteis**:
+  # - `Ctrl + Enter`: Executa linha selecionada
+  # - `Alt + -`: Insere `<-` automaticamente
+
+#2. **Boas práticas**:
+  # - Use nomes descritivos para objetos (`dados_plantas` em vez de `df1`)
+  # - Comente seu código com `#` para explicar etapas importantes
+
+#3. **Para saber mais**:
+  # - [Documentação do R](https://www.r-project.org/)
+  # - [Cheatsheet do tidyverse](https://www.tidyverse.org/learn/)
+```
+
+## Aula 2 – Importando dados externos {#aula-2}
+
+Os tópicos desta aula foram:
+
+-   Importação de dados de Excel e Google Sheets;
+-   Manipulação com `dplyr` (filtros, contagens, seleção);
+-   Visualização com `ggplot2` (gráficos customizados);
+-   Combinação de gráficos com `patchwork` ;
+
+```{r}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+# Carregando os pacotes necessários para essa aula
+library(tidyverse)    # Carrega o conjunto de pacotes do tidyverse
+library(readxl)       # Para leitura de arquivos Excel (.xls/.xlsx)
+library(writexl)      # Para exportar dados em formato .xlsx
+library(gsheet)       # Para importar planilhas do Google Sheets
+library(janitor)      # Para tabelas limpas e funções como 'tabyl'
+library(ggthemes)     # Temas visuais para gráficos com ggplot2
+library(patchwork)    # Para combinar múltiplos gráficos ggplot
+
+#---------------------------------------
+# 1. Importação de dados locais
+#---------------------------------------
+
+# Lê a 2ª planilha do arquivo Excel (essa contém 'dose')
+dados2 <- read_excel("dados-diversos.xlsx", sheet = 2)
+print(colnames(dados2))   # Verificar colunas da planilha 2, confirmar que 'dose' existe
+glimpse(dados2)
+
+#---------------------------------------
+# 2. Importação de dados adicionais
+#---------------------------------------
+
+# Lê um arquivo .csv
+curve <- read.csv("curva.csv")
+
+# Exporta os dados em dois formatos
+write_xlsx(curve, "curva2.xlsx")
+write.csv(curve, "curve2.csv", row.names = FALSE)
+
+#---------------------------------------
+# 3. Importação de dados da nuvem (Google Sheets)
+#---------------------------------------
+
+# Importa planilhas públicas do Google Sheets
+dados_nuvem <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1bq2N19DcZdtax2fQW9OHSGMR0X2__Z9T/edit?gid=373270992")
+dados_mg     <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1bq2N19DcZdtax2fQW9OHSGMR0X2__Z9T/edit?gid=983033137")
+survey       <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1bq2N19DcZdtax2fQW9OHSGMR0X2__Z9T/edit?gid=1118819738")
+
+#---------------------------------------
+# 4. Exploração inicial dos dados 'survey'
+#---------------------------------------
+
+# Contagem por grupos
+survey |> group_by(state)   |> count()
+survey |> group_by(species) |> count()
+survey |> group_by(residue) |> count()
+survey |> group_by(state, residue) |> count()
+
+# Filtro por estados específicos
+RS <- survey |> filter(state == "RS")
+PR <- survey |> filter(state == "PR")
+
+# Combina os dados dos dois estados
+combinado <- rbind(RS, PR)
+
+#---------------------------------------
+# 5. Seleção e filtragem de colunas
+#---------------------------------------
+
+# Seleciona apenas algumas colunas
+survey_b <- survey |> select(year, state, species)
+
+# Alternativa explícita com dplyr:: (equivalente)
+survey_b <- survey |> dplyr::select(year, state, species)
+
+# Filtra dados apenas do ano de 2009
+survey_2009 <- survey |>
+  select(year, state, species) |>
+  filter(year == 2009)
+
+#---------------------------------------
+# 6. Tabelas de contingência
+#---------------------------------------
+
+# Frequência cruzada entre ano e espécie
+survey_b |> tabyl(year, species)
+
+#---------------------------------------
+# 7. Visualizações com ggplot2
+#---------------------------------------
+
+# Gráfico de colunas por espécie e ano
+survey_b |>
+  group_by(year, species) |> count() |>
+  ggplot(aes(year, n)) +
+  geom_col() +
+  facet_wrap(~species)
+
+# Gráfico colorido manualmente
+survey_b |>
+  group_by(year, species) |> count() |>
+  ggplot(aes(year, n, fill = species)) +
+  geom_col() +
+  scale_fill_manual(values = c("red", "blue"))
+
+# Gráfico em escala de cinza
+survey_b |>
+  group_by(year, species) |> count() |>
+  ggplot(aes(year, n, fill = species)) +
+  geom_col() +
+  scale_fill_grey()
+
+# Gráfico com paleta viridis (mais acessível)
+survey_b |>
+  group_by(year, species) |> count() |>
+  ggplot(aes(year, n, fill = species, color = species)) +
+  geom_col() +
+  scale_fill_viridis_d()
+
+#---------------------------------------
+# 8. Visualizações do conjunto 'mg'
+#---------------------------------------
+
+# Importa os dados novamente (já feito antes, poderia ser omitido)
+mg <- dados_mg
+
+# Gráfico de dispersão simples
+mg |>
+  ggplot(aes(trat, comp)) +
+  geom_point()
+
+# Gráfico com jitter para melhor visualização
+mg |>
+  ggplot(aes(trat, comp)) +
+  geom_jitter(width = 0.1) +
+  scale_y_continuous(limits = c(0, 20))
+
+# Boxplot com jitter sobreposto
+mg |>
+  ggplot(aes(trat, comp)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.1, color = "gray50") +
+  scale_y_continuous(limits = c(0, 20)) +
+  labs(x = "Tratamento", y = "Comprimento (mm)") +
+  theme_classic()
+
+# Gráfico final formatado
+plot_mg <- mg |>
+  ggplot(aes(trat, comp)) +
+  geom_boxplot(fill = "#056646", outlier.colour = NA) +
+  geom_jitter(width = 0.1, color = "gray50") +
+  scale_y_continuous(limits = c(0, 20)) +
+  labs(
+    x = "Tratamento", y = "Comprimento (mm)",
+    title = "Efeito do magnésio",
+    subtitle = "Tamanho da lesão da mancha",
+    caption = "Betim, V. R. P. B"
+  ) +
+  theme_classic(base_size = 14)
+
+# Salva o gráfico em PNG
+ggsave("box.png", plot = plot_mg, bg = "white", width = 5, height = 4)
+
+#---------------------------------------
+# 9. Gráfico micelial
+#---------------------------------------
+
+micelial <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1bq2N19DcZdtax2fQW9OHSGMR0X2__Z9T/edit?gid=959387827")
+
+plot_micelial <- micelial |> 
+  ggplot(aes(x = reorder(especie, tcm), y = tcm)) +
+  geom_boxplot(fill = "white", outlier.colour = NA) +
+  geom_jitter(width = 0.1) +
+  coord_flip() +
+  labs(
+    x = "Espécie", y = "TCM (mm)",
+    title = "Taxa de crescimento micelial",
+    caption = "Fonte: V. Betim (2021)"
+  ) +
+  theme_clean()
+
+#---------------------------------------
+# 10. Combinação de gráficos com patchwork
+#---------------------------------------
+
+# Combina os dois gráficos lado a lado
+combo_plot <- (plot_mg + plot_micelial) + 
+  plot_annotation(tag_levels = "A")
+
+# Salva o gráfico combinado
+ggsave("combo1.png", combo_plot, bg = "white", width = 8, height = 4)
+
+```
+
+## Aula 3 – Estatística {#aula-3}
+
+Este script R apresenta uma análise estatística completa, organizada em quatro tópicos principais:
+
+-   Importação e Visualização de Dados;
+
+-   Testes Estatísticos para Comparação de Grupos;
+
+-   Análise de Variância (ANOVA) e Comparações Múltiplas;
+
+-   Modelagem Estatística Avançada e Diagnóstico;
+
+```{r}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+# ---------- Pacotes essenciais ----------
+library(gsheet)     # Importar dados direto do Google Sheets
+library(ggplot2)    # Gráficos
+library(dplyr)      # Manipulação de dados
+library(tidyr)      # Manipulação de dados (pivot_wider etc)
+library(rstatix)    # Testes estatísticos fáceis
+library(ggpubr)     # Gráficos com testes estatísticos
+library(report)     # Reporte automático dos testes
+library(car)        # Testes para ANOVA e homogeneidade
+library(emmeans)    # Médias ajustadas e comparações múltiplas
+library(multcomp)   # Comparações múltiplas
+library(multcompView) # Letras agrupadoras (post-hoc)
+library(agricolae)  # Teste de Kruskal-Wallis com agrupamento
+library(DHARMa)     # Diagnóstico de modelos GLM
+library(performance) # Avaliação de modelos
+
+# Instale os pacotes que não tiver ainda:
+# install.packages(c("gsheet","ggplot2","dplyr","tidyr","rstatix","ggpubr","report","car","emmeans","multcomp","multcompView","agricolae","DHARMa","performance"))
+
+
+# ---------- Importar dados e visualização inicial ----------
+
+# Dados magnésio - teste t e gráfico
+dat_mg <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1bq2N19DcZdtax2fQW9OHSGMR0X2__Z9T/edit?gid=983033137#gid=983033137")
+
+# Visualizar dados com jitter plot para ver distribuição por tratamento
+ggplot(dat_mg, aes(x = trat, y = comp)) +
+  geom_jitter(width = 0.1) +
+  labs(title = "Distribuição da variável comp por tratamento",
+       x = "Tratamento",
+       y = "Comprimento")
+
+# Visualizar estrutura e nomes (se precisar)
+glimpse(dat_mg)
+names(dat_mg)
+
+
+# ---------- Teste t para dados independentes ----------
+
+# Teste t clássico para comparação entre control e Mg2
+# Primeiro, precisamos dos dados no formato wide (pivot_wider)
+dat_mg_wide <- dat_mg %>%
+  tidyr::pivot_wider(names_from = trat, values_from = comp) %>%
+  dplyr::select(-dplyr::any_of("rep")) # Remove coluna de repetição se existir
+
+# Teste t (independente, variâncias não assumidas iguais)
+t_result <- t.test(dat_mg_wide$control, dat_mg_wide$Mg2, var.equal = FALSE)
+print(t_result)
+report(t_result)  # Relatório bonito do teste
+
+# Alternativa para teste t usando fórmula (do pacote rstatix)
+t_test_formula <- t.test(comp ~ trat, data = dat_mg, var.equal = FALSE)
+print(t_test_formula)
+
+
+# ---------- Boxplot com valor p no gráfico ----------
+
+# Criar data frame para colocar p-valor no gráfico
+p_values <- data.frame(
+  group1 = "control",
+  group2 = "Mg2",
+  p.value = t_result$p.value,
+  y.position = max(dat_mg$comp) * 0.9
+)
+
+# Boxplot com p-valor anotado
+p <- ggboxplot(dat_mg,
+               x = "trat",
+               y = "comp",
+               color = "trat",
+               palette = "jco") +
+  stat_pvalue_manual(p_values, label = "p.value") +
+  ylim(0, max(dat_mg$comp) * 1.1) +
+  labs(title = "Boxplot de comprimento por tratamento com p-valor",
+       x = "Tratamento",
+       y = "Comprimento")
+print(p)
+
+
+# ---------- Testes de normalidade e variância ----------
+
+# Teste Shapiro-Wilk para normalidade por grupo
+shapiro_control <- shapiro.test(dat_mg_wide$control)
+shapiro_Mg2 <- shapiro.test(dat_mg_wide$Mg2)
+print(shapiro_control)
+print(shapiro_Mg2)
+
+# Histogramas para visualizar a distribuição
+hist(dat_mg_wide$control, main = "Histograma Controle", xlab = "Comprimento")
+hist(dat_mg_wide$Mg2, main = "Histograma Mg2", xlab = "Comprimento")
+
+# Teste F para homogeneidade de variâncias
+var_homogeneity <- var.test(dat_mg_wide$control, dat_mg_wide$Mg2)
+print(var_homogeneity)
+
+
+# ---------- Teste t pareado para dados dependentes ----------
+
+# Importa outro conjunto para exemplo t pareado
+escala <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1bq2N19DcZdtax2fQW9OHSGMR0X2__Z9T/edit?gid=1729131173#gid=1729131173")
+
+# Transformar em formato wide para t test pareado
+escala_wide <- escala %>%
+  pivot_wider(id_cols = rater, names_from = assessment, values_from = acuracia)
+
+# Teste t pareado
+t_pareado <- t.test(escala_wide$Unaided, escala_wide$Aided1, paired = TRUE)
+print(t_pareado)
+
+# Boxplot para visualização
+ggplot(escala, aes(x = assessment, y = acuracia)) +
+  geom_boxplot() +
+  labs(title = "Comparação da Acurácia por Assessment",
+       x = "Assessment",
+       y = "Acurácia")
+
+
+# ---------- Testes de variância, normalidade e não-paramétricos para grupos ----------
+
+# Filtrar para grupos (separar vetor)
+unaided <- escala %>% filter(assessment == "Unaided") %>% pull(acuracia)
+aided <- escala %>% filter(assessment == "Aided1") %>% pull(acuracia)
+
+# Teste de variância
+print(var.test(unaided, aided))
+
+# Histogramas
+hist(unaided, main = "Histograma Unaided", xlab = "Acurácia")
+hist(aided, main = "Histograma Aided1", xlab = "Acurácia")
+
+# Shapiro para normalidade
+print(shapiro.test(unaided))
+print(shapiro.test(aided))
+
+# Teste t não pareado (Welch)
+print(t.test(unaided, aided, paired = FALSE, var.equal = FALSE))
+
+# Teste de Wilcoxon não pareado (não paramétrico)
+print(wilcox.test(unaided, aided, paired = FALSE))
+
+
+# ---------- Análise de Variância (ANOVA) para micélio ----------
+
+micelial <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1bq2N19DcZdtax2fQW9OHSGMR0X2__Z9T/edit?gid=959387827#gid=959387827")
+
+# Boxplot para micélio
+ggplot(micelial, aes(x = especie, y = tcm)) +
+  geom_boxplot(outlier.color = NA) +
+  geom_jitter(width = 0.1) +
+  labs(title = "Taxa de Crescimento Micelial", x = "Espécie", y = "TCM (mm)")
+
+# ANOVA e teste dos resíduos
+anova_model <- aov(tcm ~ especie, data = micelial)
+summary(anova_model)
+
+# Histogramas dos resíduos e teste Shapiro-Wilk
+hist(residuals(anova_model), main = "Resíduos ANOVA")
+print(shapiro.test(residuals(anova_model)))
+
+# Testes de homogeneidade (Bartlett e Levene)
+print(bartlett.test(tcm ~ especie, data = micelial))
+print(leveneTest(tcm ~ especie, data = micelial))
+
+# Comparações múltiplas com emmeans
+emm <- emmeans(anova_model, ~ especie)
+print(emm)
+
+# Letras agrupadoras
+print(cld(emm))
+
+# Comparação par a par
+print(pairs(emm))
+
+
+# ---------- Análise de inseticidas (InsectSprays) ----------
+
+data("InsectSprays")
+
+# Visualizar dados
+ggplot(InsectSprays, aes(x = spray, y = count)) +
+  geom_boxplot(outlier.color = NA) +
+  geom_jitter(width = 0.1) +
+  labs(title = "Contagem por Tipo de Spray", x = "Spray", y = "Count")
+
+# Teste de homogeneidade (Bartlett)
+print(bartlett.test(count ~ spray, data = InsectSprays))
+
+# Modelo linear
+lm_model <- lm(count ~ spray, data = InsectSprays)
+
+# Verificar resíduos
+hist(residuals(lm_model), main = "Resíduos do Modelo Linear")
+print(shapiro.test(residuals(lm_model)))
+qqnorm(residuals(lm_model))
+qqline(residuals(lm_model))
+
+# Alternativa: transformar variável resposta com rank
+
+# Corrigido: criar nova variável com rank(count + 0.1)
+InsectSprays <- InsectSprays %>%
+  mutate(rank_count = rank(count + 0.1))
+
+# Modelo com variável transformada
+lm_rank <- lm(rank_count ~ spray, data = InsectSprays)
+
+hist(residuals(lm_rank), main = "Resíduos após transformação")
+print(shapiro.test(residuals(lm_rank)))
+qqnorm(residuals(lm_rank))
+qqline(residuals(lm_rank))
+
+# Análise do modelo transformado
+anova(lm_rank)
+report(lm_rank)
+
+# Médias ajustadas para modelo transformado
+emm_rank <- emmeans(lm_rank, ~ spray, type = "response")
+print(emm_rank)
+print(cld(emm_rank))
+
+# Plotagem médias ajustadas
+plot(emm_rank)
+
+# Teste não paramétrico Kruskal-Wallis
+print(kruskal.test(count ~ spray, data = InsectSprays))
+
+# Teste com pacote agricolae para agrupamento
+kruskal_out <- with(InsectSprays, kruskal(count, spray, group = TRUE, console = TRUE))
+print(kruskal_out)
+
+# Diagnóstico modelo GLM Poisson (alternativa paramétrica)
+glm_poisson <- glm(count ~ spray, data = InsectSprays, family = poisson)
+anova(glm_poisson)
+Anova(glm_poisson)
+plot(simulateResiduals(glm_poisson))
+performance(glm_poisson)
+
+```
+
+## Aula 4 – Análises Estatísticas e Modelos {#aula-4}
+
+Este código aborda análises estatísticas avançadas para dados experimentais, com foco em:
+
+-   Diagnóstico de Modelos Usando o Pacote DHARMa
+-   Modelagem Estatística Paramétrica e Comparação de Médias
+-   Análise Fatorial e Interações
+-   Análise de Dados de Experimentos com Repetições e Agrupamentos
+
+```{r}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+# ----------------------------
+# Pacotes necessários
+# ----------------------------
+library(DHARMa)       # Simulação de resíduos para modelos
+library(multcomp)     # Comparações múltiplas
+library(car)          # Análises ANOVA e diagnóstico
+library(emmeans)      # Estimativa de médias marginais
+library(gsheet)       # Importar planilhas Google Sheets
+library(ggplot2)      # Visualização gráfica
+library(dplyr)        # Manipulação de dados
+library(agricolae)    # Testes não paramétricos e comparações
+library(patchwork)    # Compor múltiplos plots
+library(epifitter)    # Dados e funções epidemiológicas
+library(rstatix)      # Funções de testes estatísticos
+
+# ----------------------------
+# Modelo Linear para Insetos com Transformação
+# ----------------------------
+insetos <- InsectSprays 
+
+# Ajuste do modelo linear com transformação sqrt para normalizar resíduos
+m2 <- lm(sqrt(count) ~ spray, data = insetos)
+
+# Visualização dos resíduos simulados com DHARMa
+plot(simulateResiduals(m2))
+
+# Verificação das premissas do modelo linear
+check_model(m2)
+
+# ----------------------------
+# Modelo GLM para Insetos (Poisson)
+# ----------------------------
+m4 <- glm(count ~ spray, data = insetos, family = poisson)
+
+# Análise de variância para o GLM
+anova(m4)
+Anova(m4) # Anova pelo pacote car
+
+# Visualização dos resíduos simulados do GLM
+plot(simulateResiduals(m4))
+
+# Estimativa das médias marginais e comparações múltiplas
+medias_m4 <- emmeans(m4, ~ spray, type = "response")
+cld(medias_m4)
+
+# ----------------------------
+# Análise Fatorial: Fungicida e Dose
+# ----------------------------
+fungicida_vaso <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1bq2N19DcZdtax2fQW9OHSGMR0X2__Z9T/edit?gid=2023059672#gid=2023059672")
+
+# Visualizar severidade por dose e tratamento
+fungicida_vaso |>
+  ggplot(aes(dose, severity * 100)) +
+  geom_jitter(width = 0.1) +
+  facet_wrap(~treat)
+
+# Modelo linear com interação entre tratamento e dose
+m_anti <- lm(severity ~ treat * dose, data = fungicida_vaso)
+
+# Análise de variância do modelo
+anova(m_anti)
+
+# Simulação dos resíduos com DHARMa
+plot(simulateResiduals(m_anti))
+
+# Estimativas marginais condicionais e agrupamento
+media_anti_treat <- emmeans(m_anti, ~ treat | dose)
+cld(media_anti_treat)
+
+media_anti_dose <- emmeans(m_anti, ~ dose | treat)
+cld(media_anti_dose)
+
+# Coeficiente de variação
+cv.model(m_anti)
+
+# Gráfico de interação dose x tratamento
+interaction.plot(fungicida_vaso$treat, fungicida_vaso$dose, fungicida_vaso$severity, data = fungicida_vaso)
+
+# Gráficos separados para dose e tratamento
+p1 <- fungicida_vaso |>
+  ggplot(aes(dose, severity * 100)) +
+  geom_jitter(width = 0.1)
+
+p2 <- fungicida_vaso |>
+  ggplot(aes(treat, severity * 100)) +
+  geom_jitter(width = 0.1)
+
+# Mostrar os dois gráficos lado a lado
+p1 + p2
+
+# ----------------------------
+# Análise de Oídio - Severidade e AUDPC
+# ----------------------------
+oidio <- PowderyMildew
+
+# Visualizar severidade por tempo e tipo de irrigação
+oidio |>
+  ggplot(aes(time, sev * 100)) +
+  geom_jitter(width = 0.1) +
+  facet_wrap(~irrigation_type)
+
+# Visualização por duas variáveis condicionais
+oidio |>
+  ggplot(aes(time, sev * 100)) +
+  geom_jitter(width = 0.1) +
+  facet_grid(~irrigation_type ~ moisture)
+
+# Filtrar irrigação específicas
+oidio2 <- oidio |>
+  filter(irrigation_type %in% c("MS", "Ms above canopy", "Overhead"))
+
+# Visualizar dados filtrados
+oidio2 |>
+  ggplot(aes(time, sev * 100)) +
+  geom_jitter(width = 0.1) +
+  facet_wrap(~moisture ~ irrigation_type)
+
+# Calcular AUDPC agrupado
+oidio3 <- oidio2 |>
+  group_by(irrigation_type, moisture, block) |>
+  summarize(AUDPC = AUDPC(time, sev))
+
+# Visualizar AUDPC
+oidio3 |>
+  ggplot(aes(x = irrigation_type, y = AUDPC, color = moisture)) + 
+  geom_point(size = 2) + 
+  facet_wrap(~moisture) +
+  scale_y_continuous(limits = c(0, 20))
+
+# Modelo linear para AUDPC com interação
+model_oidio <- lm(AUDPC ~ irrigation_type * moisture, data = oidio3)
+# Verifique o objeto
+glimpse(oidio3)
+
+# Se as colunas não estiverem corretas, crie novamente:
+oidio3 <- oidio2 %>%
+  group_by(irrigation_type, moisture, block) %>%
+  summarize(AUDPC = AUDPC(time, sev), .groups = "drop")
+
+# Agora rode o teste ANOVA
+anova_test(oidio3, AUDPC ~ irrigation_type * moisture)
+
+
+# Análise de variância
+anova(model_oidio)
+
+# Simulação dos resíduos
+plot(simulateResiduals(model_oidio))
+
+# Estimativas marginais condicionais
+medias_oidio <- emmeans(model_oidio, ~ moisture | irrigation_type)
+cld(medias_oidio)
+
+# Coeficiente de variação
+cv.model(model_oidio)
+
+# Teste de ANOVA com rstatix (opcional)
+anova_test(oidio3, AUDPC ~ irrigation_type * moisture)
+
+
+
+```
+
+## Aula 5 – Modelos lineares e comparação de médias {#aula-5}
+
+Este script realiza uma análise estatística completa de experimentos agronômicos envolvendo diferentes tratamentos e variáveis de interesse:
+
+-   Importação e visualização de dados
+-   Análises estatísticas
+-   Diagnóstico de modelos
+-   Comparação de médias
+
+```{r}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+# Carregamento de pacotes necessários
+library(readxl)       # Leitura de arquivos Excel
+library(ggplot2)      # Visualização de dados
+library(DHARMa)       # Simulação e diagnóstico de resíduos
+library(emmeans)      # Estimativa de médias marginais
+library(multcomp)     # Comparações múltiplas (cld, pwpm)
+library(agricolae)    # Cálculo do coeficiente de variação
+library(lme4)         # Modelos lineares mistos
+library(dplyr)        # Manipulação de dados
+
+# Leitura dos dados
+campo <- read_xlsx("dados-diversos.xlsx", sheet = "fungicida_campo")
+milho <- read_xlsx("dados-diversos.xlsx", sheet = "milho")
+
+# Correlação entre variáveis
+cor(campo$FER, campo$PROD)
+cor.test(campo$FER, campo$DFC)
+
+# Gráfico de dispersão por tratamento com erro padrão
+campo |> 
+  ggplot(aes(x = TRAT, y = PROD)) +
+  geom_jitter(width = 0.1) +
+  stat_summary(fun.data = mean_cl_boot, geom = "errorbar", colour = "red", width = 0.3) +
+  stat_summary(fun = mean, geom = "point", colour = "red", size = 2)
+
+# Ajuste de fatores
+campo$TRAT <- factor(campo$TRAT)
+campo$BLOCO <- factor(campo$BLOCO)
+
+# Modelo linear com log da FER ~ BLOCO + TRAT
+m_campo <- lm(log(FER) ~ BLOCO + TRAT, data = campo)
+anova(m_campo)
+
+# Diagnóstico dos resíduos
+plot(simulateResiduals(m_campo))
+
+# Médias ajustadas por tratamento
+means_campo <- emmeans(m_campo, ~TRAT)
+plot(means_campo)
+cld(means_campo)        # Letras de comparação
+pwpm(means_campo)       # Comparação em forma de matriz
+cv.model(m_campo)       # Coeficiente de variação
+
+# Diagnóstico gráfico do modelo
+plot(m_campo)
+
+# Análise de correlação no conjunto milho
+milho |> 
+  ggplot(aes(index, yield)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
+
+cor.test(milho$index, milho$yield)
+cor1 <- cor(milho$index, milho$yield)
+cor1^2 * 100  # Coeficiente de determinação (%)
+
+# Gráfico comparativo entre híbridos por método
+milho |>
+  ggplot(aes(hybrid, index, color = method)) +
+  geom_jitter(width = 0.1) +
+  coord_flip()
+
+# Modelo misto: yeld ~ híbrido * método + bloco aninhado
+milho$hybrid_block <- interaction(milho$hybrid, milho$block)
+m_milho <- lmer(yield ~ hybrid * method + (1 | block:hybrid_block), data = milho)
+
+# ANOVA do modelo misto
+car::Anova(m_milho)
+
+# Diagnóstico de resíduos do modelo misto
+plot(simulateResiduals(m_milho))
+
+# Estimativa de médias por híbrido e método
+media_milho <- emmeans(m_milho, ~ hybrid | method)
+cld(media_milho, Letters = letters)
+
+media_milho <- emmeans(m_milho, ~ method | hybrid)
+cld(media_milho, Letters = letters)
+```
+
+## Aula 6 – Regressões e Estimativas de Dose-Resposta {#aula-6}
+
+Nesta aula, serão abordadas técnicas estatísticas aplicadas a dados biológicos e experimentais, com foco na análise de contagem, regressão linear e não linear. Os principais tópicos incluem:
+
+-   Transformações para Normalidade e Homogeneidade\*\*
+-   Regressão Linear Simples e Modelos Mistos\*\*
+-   Análise de Regressão Não Linear\*\*
+-   Comparações de Médias e Interpretação Biológica\*\*
+
+```{r}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+# Carregando pacotes necessários
+library(MASS)
+library(DHARMa)
+library(tidyverse)
+
+# Dataset: InsectSprays
+data("InsectSprays")
+insetos <- InsectSprays
+
+# Modelo linear com transformação sqrt
+m1 <- lm(sqrt(count) ~ spray, data = insetos)
+plot(simulateResiduals(m1))  # Avaliação de resíduos com DHARMa
+
+# Box-Cox para encontrar melhor lambda de transformação
+# Garante que count é numérica
+insetos$count <- as.numeric(as.character(insetos$count))
+
+# Aplica Box-Cox
+b <- boxcox(lm(count + 0.1 ~ 1, data = insetos))
+lambda <- b$x[which.max(b$y)]
+lambda
+
+# Aplicando transformação Box-Cox
+insetos <- insetos |>
+  mutate(count2 = ((count^lambda - 1) / lambda))
+
+# Análise de regressão linear (dados experimentais)
+library(gsheet)
+library(ggplot2)
+
+# Importando dados do Google Sheets
+stand <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1bq2N19DcZdtax2fQW9OHSGMR0X2__Z9T/edit?gid=401662555#gid=401662555")
+
+# Visualizando relação entre tratamento e número de plantas por experimento
+stand |>
+  ggplot(aes(trat, nplants)) +
+  geom_point(color = "gray") +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  facet_wrap(~exp) +
+  theme_minimal() +
+  labs(x = "% de inóculo de sementes", y = "Número de plantas")
+
+# Modelos lineares por experimento
+exp1 <- filter(stand, exp == 1)
+m_exp1 <- lm(nplants ~ trat + bloco, data = exp1)
+
+exp2 <- filter(stand, exp == 2)
+m_exp2 <- lm(nplants ~ trat, data = exp2)
+
+exp3 <- filter(stand, exp == 3)
+m_exp3 <- lm(nplants ~ trat, data = exp3)
+
+# Modelo misto considerando efeitos aleatórios (experimento e bloco)
+library(lme4)
+m_misto <- lmer(nplants ~ trat + (1 | exp/bloco), data = stand)
+car::Anova(m_misto)  # ANOVA com efeito misto
+
+# Visualização geral da regressão ajustada
+stand |>
+  ggplot(aes(trat, nplants, color = factor(exp))) +
+  geom_point() +
+  geom_abline(intercept = 69.74, slope = -0.568, linewidth = 2) +
+  geom_abline(intercept = 43, slope = -0.73, linetype = "dashed") +
+  geom_abline(intercept = 96, slope = -0.40, linetype = "dashed")
+
+# Regressão não linear
+library(drc)
+fungi <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1bq2N19DcZdtax2fQW9OHSGMR0X2__Z9T/edit?gid=465348652#gid=465348652")
+
+# Resumo e visualização das médias
+fungi |> 
+  group_by(code, dose) |> 
+  summarise(germination = mean(germination), .groups = "drop") |> 
+  ggplot(aes(dose, germination)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~code)
+
+# Regressão dose-resposta para um isolado específico
+FGT43 <- filter(fungi, code == "FGT43")
+m43 <- drm(germination ~ dose, data = FGT43, fct = W2.3())
+AIC(m43)
+plot(m43)
+ED(m43, 50)  # Dose efetiva 50%
+
+# Estimando EC50 para todos os isolados
+library(ec50estimator)
+df_ec50 <- estimate_EC50(
+  germination ~ dose,
+  data = fungi,
+  isolate_col = "code",
+  strata_col = "state",
+  interval = "delta",
+  fct = drc::LL.3()
+)
+
+# Visualizando estimativas de EC50
+df_ec50 |>
+  ggplot(aes(reorder(ID, Estimate), Estimate)) +
+  geom_point() +
+  coord_flip()
+
+# Histograma das estimativas
+df_ec50 |>
+  ggplot(aes(x = Estimate)) +
+  geom_histogram(bins = 5, color = "white")
+
+```

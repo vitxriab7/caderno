@@ -1,0 +1,55 @@
+---
+title: "Mapas"
+editor: visual
+---
+
+## Como elaborar um Mapa no R?
+
+O conjunto de dados se refere a área florestal inventáriada no estado do Paraná no ano de 2023. E queremos visualizar o alcance da equipe de inventário no estado. \
+
+```{r}
+library(geobr)
+library(sf)
+library(dplyr)
+library(ggplot2)
+library(viridis)
+library(ggspatial)
+library(readxl)
+library(DT)
+
+# Ler seus dados do Excel
+dados <- read_xlsx("mapa.xlsx") %>%
+  mutate(CD_MUN = as.numeric(CD_MUN))
+#Visualizando os dados
+datatable(dados)
+# Carregar os municípios do Paraná
+mun_pr <- read_municipality(code_muni = "PR", year = 2020)
+
+# Unir os dados com o mapa
+mun_map <- mun_pr %>%
+  left_join(dados, by = c("code_muni" = "CD_MUN"))
+
+# Plotar o mapa
+ggplot(mun_map) +
+  geom_sf(aes(fill = AREA_KM2), color = "gray50", size = 0.1) +
+  scale_fill_gradient(
+    low = "#d0f0c0",    # Verde clarinho
+    high = "#006400",   # Verde escuro
+    na.value = NA,
+    name = "Área amostrada (km²)"
+  ) +
+  theme_minimal() +
+  labs(
+    title = "Municípios Inventariados (Reserva Legal) – PR",
+    caption = "Fonte: Vitoria Betim (2023) + geobr"
+  ) +
+  annotation_scale(location = "bl", width_hint = 0.4) +
+  annotation_north_arrow(location = "tr", which_north = "true",
+                         style = north_arrow_fancy_orienteering())
+
+
+```
+
+O mapa demonstra presença de cor em municipios onde houve 1 ou mais inventários. Conforme o tom de verde escurece, a área amostrada naquele município aumenta.
+
+Essas ferramentas se aplicam para construção de mapa de epidemias ou severidade de doenças.

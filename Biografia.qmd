@@ -1,0 +1,44 @@
+---
+title: "Biografia"
+format: html
+---
+
+:::: {style="text-align: center;"}
+# 👩‍🔬 Quem sou eu?
+
+<img src="images/inventário.png" alt="Inventário florestal" width="200px" style="border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.15);"/>
+
+<br><br>
+
+Oi, meu nome é **Vitoria Betim** e eu estou muito grata pelo seu acesso! Aqui você conhece um pouco da minha trajetória acadêmica 🌿
+
+------------------------------------------------------------------------
+
+## 🎓 Sobre mim
+
+Sou **Engenheira Florestal** formada pela *Universidade Federal do Paraná* – campus Dois Vizinhos. Durante a graduação, estagiei voluntariamente na **Cooperativa dos Campos Gerais (COPERGERA)**. Fui bolsista no **PET-EF (Programa de Educação Tutorial)** de 09/2021 a 12/2023, atuando com ensino, pesquisa e extensão junto à comunidade acadêmica e local.
+
+<br>
+
+<img src="images/utfpr.jpeg" alt="UTFPR" width="200px" style="border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.15);"/>
+
+------------------------------------------------------------------------
+
+## 🌱 Atualmente
+
+Sou mestranda em **Fitopatologia** (nota 7 CAPES) pela **Universidade Federal de Viçosa**. Atuo no **Laboratório de Patologia Florestal Molecular (PATOMOL)**, integrado ao **BIOAGRO (Instituto de Biotecnologia Aplicada à Agropecuária)**, sob orientação do professor **Rafael Alfenas**.
+
+<br>
+
+<img src="images/perfil-02.jpg" alt="Vitoria" width="200px" style="border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.15);"/>
+
+------------------------------------------------------------------------
+
+## 🌐 Conecte-se comigo
+
+::: {style="text-align: center; margin-top: 20px; font-size: 2rem;"}
+<a href="https://instagram.com/vitxria.b7" target="_blank" style="color: #388E3C; margin: 0 15px;"> <i class="bi bi-instagram"></i> </a>
+
+<a href="https://www.linkedin.com/in/vbetim07/" target="_blank" style="color: #388E3C; margin: 0 15px;"> <i class="bi bi-linkedin"></i> </a>
+:::
+::::

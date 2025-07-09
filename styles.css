@@ -1,0 +1,91 @@
+/* Personalização básica em tons de verde */
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.navbar {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Links do navbar em hover */
+.navbar-nav .nav-link:hover {
+  color: #1B5E20 !important;
+}
+
+/* Ícones da navbar (GitHub, LinkedIn, etc.) */
+.navbar .bi {
+  font-size: 1.3rem;
+  margin-left: 10px;
+  color: white;
+}
+
+.navbar .bi:hover {
+  color: #C8E6C9;
+}
+
+/* Cabeçalhos principais */
+h1, h2 {
+  color: #2E7D32;
+}
+
+/* Links normais */
+a {
+  color: #388E3C;
+}
+a:hover {
+  color: #1B5E20;
+}
+
+/* 🌿 Imagem redonda com sombra (para a primeira imagem) */
+.round-img {
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.2s ease-in-out;
+}
+
+.round-img:hover {
+  transform: scale(1.02);
+}
+
+/* 🌿 Outras imagens com bordas arredondadas suaves e sombra */
+img:not(.round-img) {
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease-in-out;
+  max-width: 100%;
+  height: auto;
+}
+
+img:not(.round-img):hover {
+  transform: scale(1.02);
+}
+
+/* Ícones sociais centralizados e verdes */
+.social-icons {
+  margin-top: 20px;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.social-icons a {
+  color: #388E3C;
+  margin: 0 15px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+  color: #1B5E20;
+}
+
+/* Remove estilos de botões */
+.btn-success,
+.btn-outline-success {
+  margin: 0;
+  font-size: inherit;
+  border-radius: 0;
+}

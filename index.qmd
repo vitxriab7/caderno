@@ -1,0 +1,49 @@
+---
+title: "Apresentação"
+format: html
+page-layout: full
+---
+
+# 👋 Bem-vindo(a) ao **Meu Caderno de Aula**
+
+> 📘 Um repositório digital interativo criado com [Quarto](https://quarto.org) para organizar os conteúdos da disciplina **FIP 606 - Análise e Visualização de Dados em Fitopatologia**.
+
+------------------------------------------------------------------------
+
+![](images/fip606.jpg){width="100%"}
+
+## 🧪 Sobre a disciplina FIP 606
+
+A disciplina **Análise e visualização de dados em Fitopatologia** é oferecida pelo Programa de Pós-Graduação em Fitopatologia da **Universidade Federal de Viçosa (UFV)**.\
+Ela abrange desde fundamentos de estatística e metodologia científica até a aplicação prática da análise e visualização de dados com o **R**.
+
+### 🧠 O que você vai ver nesse site?
+
+-   Planejamento experimental: delineamentos e análise de variância;
+-   Análise de regressão e correlação;
+-   Métodos multivariados aplicados;
+-   Visualização de dados com foco em **Fitopatologia**.
+
+> A disciplina é coordenada e ministrada pelo Prof. **Emerson Medeiros Del Ponte**.
+
+------------------------------------------------------------------------
+
+## 📚 Conteúdo disponível
+
+Explore os materiais disponíveis no site:
+
+-   📖 **Aulas ministradas**\
+-   📊 **Visualizações e dashboards interativos**\
+-   👤 **Biografia e informações de contato**\
+-   📂 **Materiais complementares**
+
+------------------------------------------------------------------------
+
+## 🔎 Navegue pelo site
+
+Use o menu superior ou a ferramenta de busca para explorar os conteúdos.\
+Sinta-se à vontade para estudar, compartilhar e aplicar os conhecimentos adquiridos!
+
+> *“A estatística é o coração da pesquisa científica; visualizá-la bem é dar voz aos dados.”*
+
+------------------------------------------------------------------------

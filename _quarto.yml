@@ -1,0 +1,52 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Vivi's Journal"
+  favicon: images/favicon.ico
+  navbar:
+    background: "#2E7D32"
+    foreground: "white"
+    primary: "#A5D6A7"
+    left:
+      - text: "Início"
+        href: index.qmd
+      - text: "Aulas"
+        menu:
+          - text: "Aula 1 – Apresentação e comandos R"
+            href: Aulas.qmd#aula-1
+          - text: "Aula 2 – Importando dados externos"
+            href: Aulas.qmd#aula-2
+          - text: "Aula 3 – Estatística"
+            href: Aulas.qmd#aula-3
+          - text: "Aula 4 – Análises Estatísticas e Modelos"
+            href: Aulas.qmd#aula-4
+          - text: "Aula 5 – Modelos lineares e comparação de médias"
+            href: Aulas.qmd#aula-5
+          - text: "Aula 6 – Regressões e Estimativas de Dose-Resposta"
+            href: Aulas.qmd#aula-6
+      - text: "Biografia"
+        href: Biografia.qmd
+      - text: "Mapas"
+        href: Mapas.qmd
+    right:
+      - icon: github
+        href: "https://github.com/seu-usuario"
+      - icon: search
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    toc: false
+    page-layout: article
+    include-after-body:
+      - text: |
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    include-in-header:
+      - text: |
+          <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
